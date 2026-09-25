@@ -64,7 +64,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "fiddle"
-  gem "json", "~> 2.7"
+  gem "json", "~> 3.0"
   gem "tailwindcss-rails", "~> 4.6"
   gem "letter_opener_web", group: :development
 end
