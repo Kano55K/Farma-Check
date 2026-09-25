@@ -1,0 +1,29 @@
+<div class="max-w-md mx-auto my-10 bg-white p-8 rounded-lg shadow border border-gray-200">
+  <h1 class="text-2xl font-bold mb-4">Movimiento de Stock</h1>
+  <p class="text-sm text-gray-600 mb-6">
+    <strong>Medicamento:</strong> <%= @batch.product.name %><br>
+    <strong>Lote:</strong> <%= @batch.lot_number %> (Stock actual: <%= @batch.quantity %>)
+  </p>
+
+  <%= form_with(model: [@batch, @stock_movement], local: true, class: "space-y-4") do |f| %>
+    <div>
+      <%= f.label :movement_type, "Tipo de Movimiento", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :movement_type, StockMovement.movement_types.keys.map { |k| [k.humanize, k] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+
+    <div>
+      <%= f.label :quantity, "Cantidad", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.number_field :quantity, min: 1, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+
+    <div>
+      <%= f.label :reason, "Motivo / Observación", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :reason, placeholder: "ej. Venta en mostrador, Ajuste de inventario...", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <%= link_to "Cancelar", root_path, class: "px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-50" %>
+      <%= f.submit "Guardar Movimiento", class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

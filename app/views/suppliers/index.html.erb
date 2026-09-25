@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Proveedores</h1>
+      <p class="text-sm text-gray-500 mt-1">Droguerías y laboratorios de suministro</p>
+    </div>
+    <%= link_to "＋ Nuevo Proveedor", new_supplier_path,
+        class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg" %>
+  </div>
+
+  <div class="p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Razón Social</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">CUIT</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Contacto</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Teléfono</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Email</th>
+            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% if @suppliers.any? %>
+            <% @suppliers.each do |supplier| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 font-medium text-gray-900"><%= supplier.company_name %></td>
+                <td class="px-4 py-3 font-mono text-xs text-gray-600"><%= supplier.cuit %></td>
+                <td class="px-4 py-3 text-gray-600"><%= supplier.contact_name.presence || "—" %></td>
+                <td class="px-4 py-3 text-gray-600"><%= supplier.phone.presence || "—" %></td>
+                <td class="px-4 py-3 text-gray-600"><%= supplier.email.presence || "—" %></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex justify-center gap-2">
+                    <%= link_to "Ver", supplier_path(supplier), class: "text-blue-600 hover:underline text-xs" %>
+                    <%= link_to "Editar", edit_supplier_path(supplier), class: "text-gray-600 hover:underline text-xs" %>
+                    <% if Current.session.user.admin? %>
+                      <%= button_to "Eliminar", supplier_path(supplier), method: :delete,
+                          class: "text-red-500 hover:underline text-xs",
+                          data: { turbo_confirm: "¿Seguro que querés eliminar este proveedor?" } %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="6" class="px-4 py-8 text-center text-gray-400">
+                No hay proveedores registrados aún.
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

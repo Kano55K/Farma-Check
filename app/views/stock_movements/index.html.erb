@@ -1,0 +1,59 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white border-b border-gray-200 px-6 py-4">
+    <h1 class="text-2xl font-bold text-gray-900">Movimientos de Stock</h1>
+    <p class="text-sm text-gray-500 mt-1">Historial de entradas y salidas</p>
+  </div>
+
+  <div class="p-6">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Medicamento</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Lote</th>
+            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Tipo</th>
+            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Cantidad</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Motivo</th>
+            <th class="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase">Usuario</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% if @stock_movements.any? %>
+            <% @stock_movements.each do |movement| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-gray-500 text-xs">
+                  <%= movement.created_at.strftime("%d/%m/%Y %H:%M") %>
+                </td>
+                <td class="px-4 py-3 font-medium text-gray-900">
+                  <%= movement.batch.product.name %>
+                </td>
+                <td class="px-4 py-3 font-mono text-xs text-gray-500">
+                  <%= movement.batch.lot_number %>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <% if movement.movement_type == "entry" %>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Entrada</span>
+                  <% else %>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Salida</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-3 text-center font-semibold <%= movement.movement_type == 'entry' ? 'text-green-600' : 'text-red-600' %>">
+                  <%= movement.movement_type == "entry" ? "+" : "-" %><%= movement.quantity %>
+                </td>
+                <td class="px-4 py-3 text-gray-500"><%= movement.reason.presence || "—" %></td>
+                <td class="px-4 py-3 text-gray-500 text-xs"><%= movement.user.email_address %></td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr>
+              <td colspan="7" class="px-4 py-8 text-center text-gray-400">
+                No hay movimientos registrados aún.
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

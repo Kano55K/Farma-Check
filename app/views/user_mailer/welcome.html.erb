@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: auto; background: white; border-radius: 12px; padding: 32px; border: 1px solid #e5e7eb;">
+      <h1 style="color: #1d4ed8;">💊 Farma-Check</h1>
+      <h2 style="color: #111827;">¡Bienvenido al sistema!</h2>
+      <p style="color: #6b7280;">Hola, tu cuenta ha sido creada exitosamente.</p>
+
+      <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 16px; margin: 24px 0; border-radius: 4px;">
+        <p style="margin: 0; color: #1e40af;"><strong>Email:</strong> <%= @user.email_address %></p>
+        <p style="margin: 8px 0 0; color: #1e40af;"><strong>Rol:</strong> <%= @user.admin? ? "Administrador" : "Empleado" %></p>
+      </div>
+
+      <p style="color: #6b7280;">Ya podés acceder al sistema desde:</p>
+      <a href="http://localhost:3000" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+        Ingresar a Farma-Check
+      </a>
+
+      <p style="color: #9ca3af; font-size: 12px; margin-top: 32px;">
+        Este es un mensaje automático del sistema Farma-Check. No respondas este correo.
+      </p>
+    </div>
+  </body>
+</html>

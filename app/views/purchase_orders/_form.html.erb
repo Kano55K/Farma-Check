@@ -1,0 +1,69 @@
+<%= form_with model: purchase_order, class: "space-y-6" do |f| %>
+  <% if purchase_order.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <ul class="text-sm text-red-600 list-disc list-inside">
+        <% purchase_order.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= f.label :supplier_id, "Proveedor *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :supplier_id,
+          options_from_collection_for_select(@suppliers, :id, :company_name, purchase_order.supplier_id),
+          { prompt: "Seleccioná un proveedor" },
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+    <div>
+      <%= f.label :status, "Estado", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :status,
+          options_for_select([["Pendiente", "pending"], ["Enviada", "sent"], ["Recibida", "received"], ["Cancelada", "cancelled"]], purchase_order.status),
+          {},
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div class="md:col-span-2">
+      <%= f.label :notes, "Notas", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_area :notes, rows: 2, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+  </div>
+
+  <div>
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-semibold text-gray-800 text-sm">Productos</h3>
+    </div>
+
+    <div id="items" class="space-y-2">
+      <%= f.fields_for :purchase_order_items do |item_f| %>
+        <div class="grid grid-cols-12 gap-2 items-end">
+          <div class="col-span-6">
+            <%= item_f.select :product_id,
+                options_from_collection_for_select(@products, :id, :name, item_f.object.product_id),
+                { prompt: "Seleccioná medicamento" },
+                class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+          </div>
+          <div class="col-span-2">
+            <%= item_f.number_field :quantity, placeholder: "Cant.", min: 1,
+                class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+          </div>
+          <div class="col-span-3">
+            <%= item_f.number_field :unit_price, placeholder: "Precio unit.", step: 0.01, min: 0,
+                class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+          </div>
+          <div class="col-span-1">
+            <%= item_f.check_box :_destroy, class: "hidden", id: "destroy_#{item_f.index}" %>
+            <label for="destroy_<%= item_f.index %>" class="cursor-pointer text-red-400 hover:text-red-600 text-lg" title="Eliminar">✕</label>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit purchase_order.new_record? ? "Crear Orden" : "Guardar Cambios",
+        class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer" %>
+    <%= link_to "Cancelar", purchase_orders_path, class: "text-sm text-gray-600 hover:underline px-3 py-2" %>
+  </div>
+<% end %>

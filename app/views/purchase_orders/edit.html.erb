@@ -1,0 +1,11 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white border-b border-gray-200 px-6 py-4">
+    <p class="text-sm text-gray-400"><%= link_to "← Orden ##{@purchase_order.id}", purchase_order_path(@purchase_order), class: "hover:underline" %></p>
+    <h1 class="text-2xl font-bold text-gray-900 mt-1">Editar Orden de Compra</h1>
+  </div>
+  <div class="p-6 max-w-3xl">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <%= render "form", purchase_order: @purchase_order %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+    <div>
+      <p class="text-sm text-gray-400"><%= link_to "← Inventario", products_path, class: "hover:underline" %></p>
+      <h1 class="text-2xl font-bold text-gray-900 mt-1"><%= @product.name %></h1>
+      <p class="text-sm text-gray-500"><%= @product.active_ingredient.presence || "Sin droga activa registrada" %></p>
+    </div>
+    <div class="flex gap-2">
+      <%= link_to "Editar", edit_product_path(@product),
+          class: "border border-gray-300 text-gray-700 text-sm px-4 py-2 rounded-lg hover:bg-gray-50" %>
+      <%= link_to "+ Nuevo Lote", new_batch_path(product_id: @product.id),
+          class: "bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700" %>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Info del producto -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 space-y-3">
+      <h2 class="font-semibold text-gray-800 border-b pb-2">Datos del Medicamento</h2>
+      <div class="space-y-2 text-sm">
+        <% if @product.image.attached? %>
+        <%= image_tag @product.image, class: "w-full h-40 object-cover rounded-lg mb-3 border border-gray-200" %>
+        <% else %>
+          <div class="w-full h-40 bg-gray-100 rounded-lg mb-3 flex items-center justify-center text-gray-400 text-sm">
+            Sin imagen
+          </div>
+        <% end %>
+        <div class="flex justify-between"><span class="text-gray-500">Código</span><span class="font-mono"><%= @product.code.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Código de barras</span><span class="font-mono"><%= @product.barcode.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Laboratorio</span><span><%= @product.laboratory.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Presentación</span><span><%= @product.presentation.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Acción terapéutica</span><span><%= @product.therapeutic_action.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Ubicación góndola</span><span><%= @product.gondola_location.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Stock mínimo</span><span><%= @product.min_stock.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Stock de seguridad</span><span><%= @product.safety_stock.presence || "—" %></span></div>
+        <div class="flex justify-between"><span class="text-gray-500">Receta obligatoria</span><span><%= @product.prescription_required? ? "Sí" : "No" %></span></div>
+      </div>
+    </div>
+
+    <!-- Lotes -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200">
+      <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+        <h2 class="font-semibold text-gray-800">Lotes en Stock</h2>
+        <span class="text-sm text-gray-500">
+          Total: <strong><%= @batches.active.sum(:quantity) %> u.</strong>
+        </span>
+      </div>
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="text-left px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Nº Lote</th>
+            <th class="text-center px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Cantidad</th>
+            <th class="text-center px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Vencimiento</th>
+            <th class="text-center px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Ubicación</th>
+            <th class="text-center px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Estado</th>
+            <th class="text-center px-4 py-2 text-xs text-gray-500 font-semibold uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% if @batches.any? %>
+            <% @batches.each do |batch| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 font-mono text-xs"><%= batch.lot_number %></td>
+                <td class="px-4 py-3 text-center font-semibold"><%= batch.quantity %></td>
+                <td class="px-4 py-3 text-center"><%= batch.expiration_date.strftime("%d/%m/%Y") %></td>
+                <td class="px-4 py-3 text-center text-gray-500"><%= batch.location.presence || "—" %></td>
+                <td class="px-4 py-3 text-center">
+                  <% case batch.expiration_status
+                     when :vencido %>
+                    <span class="bg-gray-800 text-white text-xs px-2 py-1 rounded-full">VENCIDO</span>
+                  <% when :critico %>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">CRÍTICO</span>
+                  <% when :alerta %>
+                    <span class="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">ALERTA</span>
+                  <% else %>
+                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">OK</span>
+                  <% end %>
+                </td>
+                <td class="px-4 py-3 text-center">
+                  <%= link_to "Editar", edit_batch_path(batch), class: "text-gray-600 hover:underline text-xs" %>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <tr><td colspan="6" class="px-4 py-6 text-center text-gray-400">Sin lotes registrados.</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

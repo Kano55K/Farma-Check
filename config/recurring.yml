@@ -1,0 +1,4 @@
+production:
+  check_expired_batches:
+    class: CheckExpiredBatchesJob
+    schedule: "every day at 00:00"

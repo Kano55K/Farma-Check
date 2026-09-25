@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Farma-Check" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-50 text-gray-900">
+    <% if authenticated? %>
+      <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="w-56 bg-gray-900 text-white flex flex-col shrink-0">
+          <!-- Logo -->
+          <div class="px-5 py-5 border-b border-gray-700">
+            <p class="text-lg font-bold text-white">💊 Farma-Check</p>
+            <p class="text-xs text-gray-400 mt-0.5">Control de Stock</p>
+          </div>
+
+          <!-- Nav -->
+          <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+            <%= link_to dashboard_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{current_page?(dashboard_path) ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>📊</span> Dashboard
+            <% end %>
+
+            <%= link_to products_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{request.path.start_with?('/products') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>📦</span> Inventario / Stock
+            <% end %>
+
+            <%= link_to batches_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{request.path.start_with?('/batches') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>⏰</span> Vencimientos
+            <% end %>
+
+            <%= link_to stock_movements_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{request.path.start_with?('/stock_movements') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>🔄</span> Movimientos de Stock
+            <% end %>
+
+            <%= link_to suppliers_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{request.path.start_with?('/suppliers') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>🏭</span> Proveedores
+            <% end %>
+
+            <%= link_to purchase_orders_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium #{request.path.start_with?('/purchase_orders') ? 'bg-blue-600 text-white' : 'text-gray-300 hover:bg-gray-800'}" do %>
+              <span>🛒</span> Órdenes de Compra
+            <% end %>
+
+            <%= link_to new_user_path, class: "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800" do %>
+              <span>👥</span> Nuevo Usuario
+            <% end %>
+          </nav>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto">
+          <%= yield %>
+        </main>
+      </div>
+    <% else %>
+      <%= yield %>
+    <% end %>
+  </body>
+</html>

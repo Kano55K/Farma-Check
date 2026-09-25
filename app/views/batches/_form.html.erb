@@ -1,0 +1,61 @@
+<%= form_with model: batch, class: "space-y-5" do |f| %>
+  <% if batch.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <p class="text-red-700 font-medium text-sm"><%= pluralize(batch.errors.count, "error") %> impidieron guardar:</p>
+      <ul class="mt-2 text-sm text-red-600 list-disc list-inside">
+        <% batch.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="md:col-span-2">
+      <%= f.label :product_id, "Medicamento *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :product_id,
+          options_from_collection_for_select(@products, :id, :name, batch.product_id),
+          { prompt: "Seleccioná un medicamento" },
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :lot_number, "Número de lote *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :lot_number, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :expiration_date, "Fecha de vencimiento *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.date_field :expiration_date, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :quantity, "Cantidad *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.number_field :quantity, min: 0, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :location, "Ubicación física", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :location, placeholder: "Ej: Estante A2, Heladera 1",
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= f.label :status, "Estado del lote", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.select :status,
+          options_for_select([["Activo", "active"], ["Vencido", "expired"], ["Retirado (ANMAT)", "recalled"]], batch.status),
+          {},
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit batch.new_record? ? "Ingresar Lote" : "Guardar Cambios",
+        class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer" %>
+    <% if batch.product_id.present? %>
+      <%= link_to "Cancelar", product_path(batch.product_id), class: "text-sm text-gray-600 hover:underline px-3 py-2" %>
+    <% else %>
+      <%= link_to "Cancelar", products_path, class: "text-sm text-gray-600 hover:underline px-3 py-2" %>
+    <% end %>
+  </div>
+<% end %>

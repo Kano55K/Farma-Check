@@ -1,0 +1,80 @@
+<%= form_with model: product, class: "space-y-6" do |f| %>
+  <% if product.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <p class="text-red-700 font-medium text-sm"><%= pluralize(product.errors.count, "error") %> impidieron guardar:</p>
+      <ul class="mt-2 text-sm text-red-600 list-disc list-inside">
+        <% product.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <%= f.label :name, "Nombre del medicamento *", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+    <div>
+      <%= f.label :active_ingredient, "Droga activa (monodroga)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :active_ingredient, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :laboratory, "Laboratorio", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :laboratory, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :presentation, "Presentación", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :presentation, placeholder: "Ej: Comprimidos, Jarabe, Inyectable",
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :barcode, "Código de barras", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :barcode, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %>
+    </div>
+    <div>
+      <%= f.label :code, "Código interno", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :code, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono" %>
+    </div>
+    <div>
+      <%= f.label :therapeutic_action, "Acción terapéutica", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :therapeutic_action, placeholder: "Ej: Analgésico, Antibiótico, Antihipertensivo",
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :gondola_location, "Ubicación en góndola/droguero", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :gondola_location, placeholder: "Ej: A3, Góndola 2, Frío",
+          class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :min_stock, "Stock mínimo (punto de reposición)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.number_field :min_stock, min: 0, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div>
+      <%= f.label :safety_stock, "Stock de seguridad", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.number_field :safety_stock, min: 0, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <%= f.check_box :prescription_required, class: "rounded border-gray-300" %>
+    <%= f.label :prescription_required, "Requiere receta médica", class: "text-sm text-gray-700" %>
+  </div>
+
+  <div class="md:col-span-2">
+  <%= f.label :image, "Imagen del producto", class: "block text-sm font-medium text-gray-700 mb-1" %>
+  <% if product.image.attached? %>
+    <div class="mb-2">
+      <%= image_tag product.image, class: "h-24 w-24 object-cover rounded-lg border border-gray-200" %>
+    </div>
+  <% end %>
+  <%= f.file_field :image, accept: "image/*",
+      class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+</div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit product.new_record? ? "Crear Medicamento" : "Guardar Cambios",
+        class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer" %>
+    <%= link_to "Cancelar", products_path, class: "text-sm text-gray-600 hover:underline px-3 py-2" %>
+  </div>
+<% end %>
