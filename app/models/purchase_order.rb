@@ -1,3 +1,4 @@
+# Orden de compra emitida a un proveedor para abastecer medicamentos o insumos.
 class PurchaseOrder < ApplicationRecord
   belongs_to :supplier
   has_many :purchase_order_items, dependent: :destroy

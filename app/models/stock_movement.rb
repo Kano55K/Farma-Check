@@ -1,3 +1,4 @@
+# Registra cada movimiento de inventario: entrada, salida, ajuste o merma por vencimiento.
 class StockMovement < ApplicationRecord
   belongs_to :batch
   belongs_to :user
@@ -8,6 +9,7 @@ class StockMovement < ApplicationRecord
 
   private
 
+  # Actualiza el stock del lote según el tipo de movimiento registrado.
   def update_batch_quantity
     case movement_type
     when "entrada"

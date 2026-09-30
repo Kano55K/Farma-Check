@@ -1,3 +1,4 @@
+# Un lote pertenece a un producto y concentra la cantidad, vencimiento y estado del stock.
 class Batch < ApplicationRecord
   belongs_to :product
   has_many :stock_movements, dependent: :destroy
@@ -12,6 +13,7 @@ class Batch < ApplicationRecord
   scope :expiring_warning, -> { active.where(expiration_date: 30.days.from_now..90.days.from_now) }
   scope :not_expired, -> { active.where("expiration_date > ?", Date.today) }
 
+  # Evalúa si el lote está vencido, próximo a vencer o dentro de rango normal.
   def expiration_status
     return :vencido if expired? || expiration_date < Date.today
     return :critico if expiration_date <= 30.days.from_now

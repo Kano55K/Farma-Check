@@ -1,7 +1,9 @@
+# CRUD del catálogo farmacéutico con filtros de búsqueda, stock y permisos de administración.
 class ProductsController < ApplicationController
   before_action :set_product, only: %i[show edit update destroy]
   before_action :require_admin!, only: %i[destroy]
 
+  # Lista los medicamentos con búsqueda y filtros por laboratorio, acción terapéutica y estado del stock.
   def index
     @products = Product.all
 
@@ -31,6 +33,7 @@ class ProductsController < ApplicationController
     @therapeutic_actions = Product.distinct.pluck(:therapeutic_action).compact.sort
   end
 
+  # Muestra el detalle del medicamento y sus lotes asociados.
   def show
     @batches = @product.batches.order(expiration_date: :asc)
   end
@@ -66,10 +69,12 @@ class ProductsController < ApplicationController
 
   private
 
+  # Carga el producto desde el id recibido en la URL.
   def set_product
     @product = Product.find(params[:id])
   end
 
+  # Rechaza la eliminación si el usuario no es administrador.
   def require_admin!
     unless Current.session.user.admin?
       redirect_to products_path, alert: "No tenés permisos para realizar esta acción."

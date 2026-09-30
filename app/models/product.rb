@@ -1,3 +1,4 @@
+# Representa un medicamento del catálogo y calcula su disponibilidad real en stock.
 class Product < ApplicationRecord
   has_many :batches, dependent: :destroy
   has_many :purchase_order_items, dependent: :destroy
@@ -13,10 +14,12 @@ class Product < ApplicationRecord
       .having("SUM(batches.quantity) <= products.min_stock")
   }
 
+  # Suma la cantidad disponible de los lotes activos del producto.
   def total_stock
     batches.active.sum(:quantity)
   end
 
+  # Devuelve el estado del medicamento para mostrar alertas de inventario.
   def stock_status
     stock = total_stock
     return :sin_stock if stock == 0

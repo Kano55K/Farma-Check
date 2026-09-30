@@ -1,3 +1,4 @@
+# Revisa diariamente los lotes vencidos y actualiza su estado para activar alertas.
 class CheckExpiredBatchesJob < ApplicationJob
   queue_as :default
 

@@ -1,3 +1,4 @@
+# Línea de una orden de compra; vincula un producto con cantidad y precio unitario.
 class PurchaseOrderItem < ApplicationRecord
   belongs_to :purchase_order
   belongs_to :product

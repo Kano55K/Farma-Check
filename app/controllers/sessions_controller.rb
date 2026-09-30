@@ -1,3 +1,4 @@
+# Controla el login y logout del back-office.
 class SessionsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create ]
   rate_limit to: 10, within: 3.minutes, only: :create, with: -> {
@@ -5,9 +6,11 @@ class SessionsController < ApplicationController
     redirect_to new_session_path
   }
 
+  # Muestra el formulario de inicio de sesión.
   def new
   end
 
+  # Verifica credenciales y crea la sesión del usuario.
   def create
     if user = User.authenticate_by(email_address: params[:email_address], password: params[:password])
       start_new_session_for user
@@ -18,6 +21,7 @@ class SessionsController < ApplicationController
     end
   end
 
+  # Cierra la sesión activa del usuario.
   def destroy
     terminate_session
     redirect_to new_session_path
