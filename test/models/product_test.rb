@@ -9,14 +9,14 @@ class ProductTest < ActiveSupport::TestCase
   test "no es válido sin nombre" do
     product = Product.new(name: nil)
     assert_not product.valid?
-    assert_includes product.errors[:name], "can't be blank"
+    assert_includes product.errors[:name], "no puede estar en blanco"
   end
 
   test "no permite código de barras duplicado" do
     Product.create!(name: "Producto A", barcode: "1234567890")
     product = Product.new(name: "Producto B", barcode: "1234567890")
     assert_not product.valid?
-    assert_includes product.errors[:barcode], "has already been taken"
+    assert_includes product.errors[:barcode], "ya está en uso"
   end
 
   test "permite código de barras vacío en múltiples productos" do

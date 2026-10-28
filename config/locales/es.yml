@@ -1,0 +1,163 @@
+# Traducciones mínimas al español para mensajes de validación (back-office y API).
+es:
+  activerecord:
+    models:
+      user: Usuario
+      product: Producto
+      batch: Lote
+      stock_movement: Movimiento de stock
+      supplier: Proveedor
+      purchase_order: Orden de compra
+      purchase_order_item: Ítem de orden de compra
+    attributes:
+      user:
+        email_address: Email
+        password: Contraseña
+        password_confirmation: Confirmación de contraseña
+        role: Rol
+      product:
+        name: Nombre
+        active_ingredient: Droga
+        code: Código
+        barcode: Código de barras
+        laboratory: Laboratorio
+        presentation: Presentación
+        therapeutic_action: Acción terapéutica
+        gondola_location: Góndola
+        min_stock: Stock mínimo
+        safety_stock: Stock de seguridad
+        prescription_required: Requiere receta
+      batch:
+        product: Producto
+        lot_number: Número de lote
+        expiration_date: Fecha de vencimiento
+        quantity: Cantidad
+        location: Ubicación
+        status: Estado
+      stock_movement:
+        batch: Lote
+        user: Usuario
+        movement_type: Tipo de movimiento
+        quantity: Cantidad
+        reason: Motivo
+      supplier:
+        company_name: Razón social
+        cuit: CUIT
+        email: Email
+        phone: Teléfono
+        contact_name: Contacto
+        purchase_orders: Órdenes de compra
+      purchase_order:
+        supplier: Proveedor
+        status: Estado
+        notes: Notas
+        total_amount: Total
+        purchase_order_items: Ítems
+      purchase_order_item:
+        product: Producto
+        quantity: Cantidad
+        unit_price: Precio unitario
+    errors:
+      messages:
+        record_invalid: "La validación falló: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "No se puede eliminar porque existe un %{record} dependiente"
+          has_many: "No se puede eliminar porque existen %{record} dependientes"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      accepted: debe ser aceptado
+      blank: no puede estar en blanco
+      confirmation: no coincide con %{attribute}
+      empty: no puede estar vacío
+      equal_to: debe ser igual a %{count}
+      even: debe ser par
+      exclusion: está reservado
+      greater_than: debe ser mayor que %{count}
+      greater_than_or_equal_to: debe ser mayor o igual a %{count}
+      in: debe estar en %{count}
+      inclusion: no está incluido en la lista
+      invalid: no es válido
+      less_than: debe ser menor que %{count}
+      less_than_or_equal_to: debe ser menor o igual a %{count}
+      model_invalid: "La validación falló: %{errors}"
+      not_a_number: no es un número
+      not_an_integer: debe ser un número entero
+      odd: debe ser impar
+      other_than: debe ser distinto de %{count}
+      present: debe estar en blanco
+      required: debe existir
+      taken: ya está en uso
+      too_long:
+        one: es demasiado largo (máximo 1 carácter)
+        other: es demasiado largo (máximo %{count} caracteres)
+      too_short:
+        one: es demasiado corto (mínimo 1 carácter)
+        other: es demasiado corto (mínimo %{count} caracteres)
+      wrong_length:
+        one: no tiene la longitud correcta (1 carácter exactos)
+        other: no tiene la longitud correcta (%{count} caracteres exactos)
+      password_too_long: es demasiado larga
+  helpers:
+    select:
+      prompt: Seleccioná
+    submit:
+      create: Crear %{model}
+      submit: Guardar %{model}
+      update: Actualizar %{model}
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: alrededor de 1 hora
+        other: alrededor de %{count} horas
+      about_x_months:
+        one: alrededor de 1 mes
+        other: alrededor de %{count} meses
+      about_x_years:
+        one: alrededor de 1 año
+        other: alrededor de %{count} años
+      almost_x_years:
+        one: casi 1 año
+        other: casi %{count} años
+      half_a_minute: medio minuto
+      less_than_x_minutes:
+        one: menos de 1 minuto
+        other: menos de %{count} minutos
+      less_than_x_seconds:
+        one: menos de 1 segundo
+        other: menos de %{count} segundos
+      over_x_years:
+        one: más de 1 año
+        other: más de %{count} años
+      x_days:
+        one: 1 día
+        other: "%{count} días"
+      x_minutes:
+        one: 1 minuto
+        other: "%{count} minutos"
+      x_months:
+        one: 1 mes
+        other: "%{count} meses"
+      x_seconds:
+        one: 1 segundo
+        other: "%{count} segundos"
+      x_years:
+        one: 1 año
+        other: "%{count} años"
+  number:
+    format:
+      delimiter: "."
+      separator: ","
+      precision: 2
+    currency:
+      format:
+        unit: "$"
+        format: "%u %n"
+        delimiter: "."
+        separator: ","
+        precision: 2
+  support:
+    array:
+      words_connector: ", "
+      two_words_connector: " y "
+      last_word_connector: " y "

@@ -19,13 +19,13 @@ class BatchTest < ActiveSupport::TestCase
   test "no es válido sin número de lote" do
     batch = Batch.new(product: @product, expiration_date: 1.year.from_now, quantity: 10)
     assert_not batch.valid?
-    assert_includes batch.errors[:lot_number], "can't be blank"
+    assert_includes batch.errors[:lot_number], "no puede estar en blanco"
   end
 
   test "no es válido sin fecha de vencimiento" do
     batch = Batch.new(product: @product, lot_number: "L001", quantity: 10)
     assert_not batch.valid?
-    assert_includes batch.errors[:expiration_date], "can't be blank"
+    assert_includes batch.errors[:expiration_date], "no puede estar en blanco"
   end
 
   test "no es válido con cantidad negativa" do

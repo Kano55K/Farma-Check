@@ -9,14 +9,14 @@ class UserTest < ActiveSupport::TestCase
   test "no es válido sin email" do
     user = User.new(password: "password123")
     assert_not user.valid?
-    assert_includes user.errors[:email_address], "can't be blank"
+    assert_includes user.errors[:email_address], "no puede estar en blanco"
   end
 
   test "no permite emails duplicados" do
     User.create!(email_address: "test@farma.com", password: "password123")
     user = User.new(email_address: "test@farma.com", password: "otropassword")
     assert_not user.valid?
-    assert_includes user.errors[:email_address], "has already been taken"
+    assert_includes user.errors[:email_address], "ya está en uso"
   end
 
   test "normaliza el email a minúsculas" do

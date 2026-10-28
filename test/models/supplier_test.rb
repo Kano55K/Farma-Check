@@ -9,26 +9,26 @@ class SupplierTest < ActiveSupport::TestCase
   test "no es válido sin razón social" do
     supplier = Supplier.new(cuit: "30-12345678-1")
     assert_not supplier.valid?
-    assert_includes supplier.errors[:company_name], "can't be blank"
+    assert_includes supplier.errors[:company_name], "no puede estar en blanco"
   end
 
   test "no es válido sin CUIT" do
     supplier = Supplier.new(company_name: "Droguería Test")
     assert_not supplier.valid?
-    assert_includes supplier.errors[:cuit], "can't be blank"
+    assert_includes supplier.errors[:cuit], "no puede estar en blanco"
   end
 
   test "no permite CUITs duplicados" do
     Supplier.create!(company_name: "Droguería A", cuit: "30-12345678-1")
     supplier = Supplier.new(company_name: "Droguería B", cuit: "30-12345678-1")
     assert_not supplier.valid?
-    assert_includes supplier.errors[:cuit], "has already been taken"
+    assert_includes supplier.errors[:cuit], "ya está en uso"
   end
 
   test "no es válido con email mal formado" do
     supplier = Supplier.new(company_name: "Test", cuit: "30-99999999-9", email: "no-es-un-email")
     assert_not supplier.valid?
-    assert_includes supplier.errors[:email], "is invalid"
+    assert_includes supplier.errors[:email], "no es válido"
   end
 end
 
