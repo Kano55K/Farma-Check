@@ -1,0 +1,20 @@
+pending:
+  supplier: one
+  status: 0
+  total_amount: 2500.0
+  notes: Reposición mensual
+
+sent:
+  supplier: one
+  status: 1
+  total_amount: 1000.0
+
+received:
+  supplier: two
+  status: 2
+  total_amount: 500.0
+
+cancelled:
+  supplier: two
+  status: 3
+  total_amount: 300.0

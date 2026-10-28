@@ -1,15 +1,25 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Lotes con fechas relativas a hoy para que el semáforo de vencimiento sea estable.
 
 one:
   product: one
-  lot_number: MyString
-  expiration_date: 2026-09-16
-  quantity: 1
-  status: 1
+  lot_number: L-IBU-001
+  expiration_date: <%= 1.year.from_now.to_date %>
+  quantity: 100
+  location: Estante A1
+  status: 0
 
 two:
   product: two
-  lot_number: MyString
-  expiration_date: 2026-09-16
-  quantity: 1
-  status: 1
+  lot_number: L-AMO-001
+  expiration_date: <%= 20.days.from_now.to_date %>
+  quantity: 30
+  location: Estante B2
+  status: 0
+
+expired:
+  product: one
+  lot_number: L-IBU-000
+  expiration_date: <%= 10.days.ago.to_date %>
+  quantity: 15
+  location: Estante A1
+  status: 0

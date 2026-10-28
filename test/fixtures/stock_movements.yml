@@ -5,11 +5,11 @@ one:
   user: one
   movement_type: 1
   quantity: 1
-  reason: MyString
+  reason: Venta en mostrador
 
 two:
   batch: two
   user: two
-  movement_type: 1
-  quantity: 1
-  reason: MyString
+  movement_type: 0
+  quantity: 10
+  reason: Compra a droguería

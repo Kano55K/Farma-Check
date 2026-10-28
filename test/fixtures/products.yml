@@ -1,13 +1,32 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
-  active_ingredient: MyString
-  code: MyString
+  name: Ibuprofeno 400 mg
+  active_ingredient: Ibuprofeno
+  code: IBU400
+  barcode: "7790001000011"
+  laboratory: Bagó
+  presentation: Comprimidos x 20
+  min_stock: 10
+  safety_stock: 5
   prescription_required: false
 
 two:
-  name: MyString
-  active_ingredient: MyString
-  code: MyString
-  prescription_required: false
+  name: Amoxicilina 500 mg
+  active_ingredient: Amoxicilina
+  code: AMO500
+  barcode: "7790001000028"
+  laboratory: Roemmers
+  presentation: Cápsulas x 16
+  min_stock: 50
+  safety_stock: 10
+  prescription_required: true
+
+empty:
+  name: Enalapril 10 mg
+  active_ingredient: Enalapril
+  code: ENA10
+  laboratory: Gador
+  presentation: Comprimidos x 30
+  min_stock: 5
+  prescription_required: true

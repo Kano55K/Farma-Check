@@ -1,0 +1,29 @@
+pending_ibu:
+  purchase_order: pending
+  product: one
+  quantity: 50
+  unit_price: 30.0
+
+pending_amo:
+  purchase_order: pending
+  product: two
+  quantity: 20
+  unit_price: 50.0
+
+sent_ibu:
+  purchase_order: sent
+  product: one
+  quantity: 40
+  unit_price: 25.0
+
+received_amo:
+  purchase_order: received
+  product: two
+  quantity: 10
+  unit_price: 50.0
+
+cancelled_amo:
+  purchase_order: cancelled
+  product: two
+  quantity: 6
+  unit_price: 50.0

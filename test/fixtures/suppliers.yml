@@ -1,0 +1,12 @@
+one:
+  company_name: Droguería del Sur S.A.
+  cuit: 30-71234567-1
+  email: ventas@drogueriadelsur.com.ar
+  phone: "011 4555-1234"
+  contact_name: Marta Gómez
+
+two:
+  company_name: Distribuidora Pampa S.R.L.
+  cuit: 30-70987654-2
+  email: pedidos@pampa.com.ar
+  contact_name: Jorge Ruiz
