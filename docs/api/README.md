@@ -1,6 +1,6 @@
 # Contrato de la API de Farma-Check (v1)
 
-API REST en JSON que consume el front-end del usuario final ([farma-check-front](../../README.md#front-end)).
+API REST en JSON que consume el front-end del usuario final ([farma-check-front](https://github.com/Kano55K/farma-check-front)).
 El back-office de Rails (vistas ERB) es un contexto aparte y **no** usa esta API.
 
 Todos los ejemplos de este contrato son **respuestas reales**: se obtuvieron con el servidor en
