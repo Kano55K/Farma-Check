@@ -22,11 +22,20 @@ Rails.application.routes.draw do
       post "login", to: "sessions#create"
       delete "logout", to: "sessions#destroy"
       get "profile", to: "users#profile"
+      get "dashboard", to: "dashboard#show"
 
       resources :products, only: [ :index, :show ]
       resources :batches, only: [ :index, :show ]
       resources :stock_movements, only: [ :index, :create ]
-      resources :suppliers, only: [ :index, :show ]
+      resources :suppliers, only: [ :index, :show, :create, :update ]
+      resources :purchase_orders, only: [ :index, :show, :create ] do
+        member do
+          # La acción no se llama "send" para no pisar Object#send.
+          patch :send, action: :send_order, as: :send
+          patch :cancel
+          post :receive
+        end
+      end
     end
   end
 

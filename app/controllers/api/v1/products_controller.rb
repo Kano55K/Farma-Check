@@ -1,61 +1,32 @@
 module Api
   module V1
     class ProductsController < BaseController
+      # GET /api/v1/products — búsqueda, filtros y paginación.
+      # El stock se calcula en la misma consulta (with_active_stock) para evitar N+1.
       def index
-        products = Product.all
-        products = products.where("name LIKE ? OR active_ingredient LIKE ?",
-                                  "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
-        products = products.where(laboratory: params[:laboratory]) if params[:laboratory].present?
+        validate_filter!(:stock_status, Product::STOCK_STATUSES)
+        validate_filter!(:prescription_required, %w[true false])
 
-        render json: products.map { |p|
-          {
-            id: p.id,
-            name: p.name,
-            active_ingredient: p.active_ingredient,
-            laboratory: p.laboratory,
-            presentation: p.presentation,
-            barcode: p.barcode,
-            therapeutic_action: p.therapeutic_action,
-            gondola_location: p.gondola_location,
-            min_stock: p.min_stock,
-            safety_stock: p.safety_stock,
-            prescription_required: p.prescription_required,
-            total_stock: p.batches.active.sum(:quantity),
-            stock_status: p.stock_status
-          }
+        products = Product.with_active_stock.order(:name, :id)
+        if params[:search].present?
+          term = "%#{Product.sanitize_sql_like(params[:search].to_s.strip)}%"
+          products = products.where("products.name LIKE :term OR products.active_ingredient LIKE :term OR products.barcode LIKE :term", term: term)
+        end
+        products = products.where(laboratory: params[:laboratory]) if params[:laboratory].present?
+        products = products.where(prescription_required: params[:prescription_required] == "true") if params[:prescription_required].present?
+        products = products.by_stock_status(params[:stock_status]) if params[:stock_status].present?
+
+        records, meta = paginate(products)
+        render json: {
+          data: ProductSerializer.render(records),
+          meta: meta.merge(laboratories: Product.where.not(laboratory: [ nil, "" ]).distinct.order(:laboratory).pluck(:laboratory))
         }
       end
 
+      # GET /api/v1/products/:id — incluye los lotes ordenados por vencimiento.
       def show
-        product = Product.find(params[:id])
-        render json: {
-          id: product.id,
-          name: product.name,
-          active_ingredient: product.active_ingredient,
-          laboratory: product.laboratory,
-          presentation: product.presentation,
-          barcode: product.barcode,
-          therapeutic_action: product.therapeutic_action,
-          gondola_location: product.gondola_location,
-          min_stock: product.min_stock,
-          safety_stock: product.safety_stock,
-          prescription_required: product.prescription_required,
-          total_stock: product.batches.active.sum(:quantity),
-          stock_status: product.stock_status,
-          batches: product.batches.map { |b|
-            {
-              id: b.id,
-              lot_number: b.lot_number,
-              expiration_date: b.expiration_date,
-              quantity: b.quantity,
-              status: b.status,
-              location: b.location,
-              expiration_status: b.expiration_status
-            }
-          }
-        }
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: "Producto no encontrado" }, status: :not_found
+        product = Product.includes(:batches).find(params[:id])
+        render json: { data: ProductSerializer.render(product, include_batches: true) }
       end
     end
   end
