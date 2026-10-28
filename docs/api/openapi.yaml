@@ -1,0 +1,631 @@
+openapi: 3.0.3
+info:
+  title: Farma-Check API
+  version: "1.0"
+  description: |
+    API del usuario final de Farma-Check. El detalle por endpoint, con ejemplos reales, está en
+    los archivos Markdown de esta carpeta (README.md). Esta especificación resume rutas, parámetros
+    y esquemas para importarla en Postman o Swagger UI.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Autenticación
+  - name: Dashboard
+  - name: Productos
+  - name: Lotes
+  - name: Movimientos
+  - name: Proveedores
+  - name: Órdenes de compra
+
+paths:
+  /login:
+    post:
+      tags: [Autenticación]
+      summary: Iniciar sesión
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email_address, password]
+              properties:
+                email_address: { type: string, format: email, example: empleado@farma-check.com }
+                password: { type: string, example: demo1234 }
+      responses:
+        "200":
+          description: Sesión iniciada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoginResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /logout:
+    delete:
+      tags: [Autenticación]
+      summary: Cerrar sesión (invalida el token)
+      responses:
+        "200":
+          description: Sesión cerrada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Message" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /profile:
+    get:
+      tags: [Autenticación]
+      summary: Usuario autenticado
+      responses:
+        "200":
+          description: Perfil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/User"
+                  - type: object
+                    properties:
+                      token_expires_at: { type: string, format: date-time }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /dashboard:
+    get:
+      tags: [Dashboard]
+      summary: KPIs y alertas
+      responses:
+        "200":
+          description: Indicadores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Dashboard" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /products:
+    get:
+      tags: [Productos]
+      summary: Listar productos
+      parameters:
+        - { name: search, in: query, schema: { type: string }, description: Nombre, droga o código de barras }
+        - { name: laboratory, in: query, schema: { type: string } }
+        - { name: stock_status, in: query, schema: { $ref: "#/components/schemas/StockStatus" } }
+        - { name: prescription_required, in: query, schema: { type: string, enum: ["true", "false"] } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+      responses:
+        "200":
+          description: Listado paginado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Product" } }
+                  meta:
+                    allOf:
+                      - $ref: "#/components/schemas/PageMeta"
+                      - type: object
+                        properties:
+                          laboratories: { type: array, items: { type: string } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /products/{id}:
+    get:
+      tags: [Productos]
+      summary: Detalle de producto con lotes
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200":
+          description: Producto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/Product"
+                      - type: object
+                        properties:
+                          batches: { type: array, items: { $ref: "#/components/schemas/Batch" } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /batches:
+    get:
+      tags: [Lotes]
+      summary: Listar lotes por vencimiento
+      parameters:
+        - { name: expiration_status, in: query, schema: { $ref: "#/components/schemas/ExpirationStatus" } }
+        - { name: product_id, in: query, schema: { type: integer } }
+        - { name: with_stock, in: query, schema: { type: string, enum: ["true"] } }
+        - { name: sort, in: query, schema: { type: string, enum: [expiration_date, -expiration_date], default: expiration_date } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+      responses:
+        "200":
+          description: Listado paginado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Batch" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /batches/{id}:
+    get:
+      tags: [Lotes]
+      summary: Detalle de lote
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200":
+          description: Lote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { $ref: "#/components/schemas/Batch" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /stock_movements:
+    get:
+      tags: [Movimientos]
+      summary: Historial de movimientos
+      parameters:
+        - { name: movement_type, in: query, schema: { $ref: "#/components/schemas/MovementType" } }
+        - { name: batch_id, in: query, schema: { type: integer } }
+        - { name: product_id, in: query, schema: { type: integer } }
+        - { name: from, in: query, schema: { type: string, format: date } }
+        - { name: to, in: query, schema: { type: string, format: date } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+      responses:
+        "200":
+          description: Listado paginado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/StockMovement" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+    post:
+      tags: [Movimientos]
+      summary: Registrar movimiento (actualiza el stock del lote)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stock_movement]
+              properties:
+                stock_movement:
+                  type: object
+                  required: [batch_id, movement_type, quantity]
+                  properties:
+                    batch_id: { type: integer }
+                    movement_type: { $ref: "#/components/schemas/MovementType" }
+                    quantity: { type: integer, minimum: 0, description: "> 0 salvo en ajuste (>= 0)" }
+                    reason: { type: string }
+      responses:
+        "201":
+          description: Movimiento registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  data: { $ref: "#/components/schemas/StockMovement" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+  /suppliers:
+    get:
+      tags: [Proveedores]
+      summary: Listar proveedores
+      parameters:
+        - { name: search, in: query, schema: { type: string } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+      responses:
+        "200":
+          description: Listado paginado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/Supplier" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Proveedores]
+      summary: Alta de proveedor (solo admin)
+      requestBody: { $ref: "#/components/requestBodies/SupplierBody" }
+      responses:
+        "201": { $ref: "#/components/responses/SupplierResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /suppliers/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Proveedores]
+      summary: Detalle con órdenes recientes
+      responses:
+        "200": { $ref: "#/components/responses/SupplierResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Proveedores]
+      summary: Edición de proveedor (solo admin)
+      requestBody: { $ref: "#/components/requestBodies/SupplierBody" }
+      responses:
+        "200": { $ref: "#/components/responses/SupplierResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+  /purchase_orders:
+    get:
+      tags: [Órdenes de compra]
+      summary: Listar órdenes
+      parameters:
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/OrderStatus" } }
+        - { name: supplier_id, in: query, schema: { type: integer } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PerPage"
+      responses:
+        "200":
+          description: Listado paginado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: { type: array, items: { $ref: "#/components/schemas/PurchaseOrder" } }
+                  meta: { $ref: "#/components/schemas/PageMeta" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+    post:
+      tags: [Órdenes de compra]
+      summary: Crear orden con ítems (total calculado por el servidor)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purchase_order]
+              properties:
+                purchase_order:
+                  type: object
+                  required: [supplier_id, items]
+                  properties:
+                    supplier_id: { type: integer }
+                    notes: { type: string }
+                    items:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: object
+                        required: [product_id, quantity]
+                        properties:
+                          product_id: { type: integer }
+                          quantity: { type: integer, minimum: 1 }
+                          unit_price: { type: number, minimum: 0 }
+      responses:
+        "201": { $ref: "#/components/responses/OrderResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /purchase_orders/{id}:
+    get:
+      tags: [Órdenes de compra]
+      summary: Detalle con ítems
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { $ref: "#/components/responses/OrderResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /purchase_orders/{id}/send:
+    patch:
+      tags: [Órdenes de compra]
+      summary: pending → sent
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { $ref: "#/components/responses/OrderResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /purchase_orders/{id}/cancel:
+    patch:
+      tags: [Órdenes de compra]
+      summary: pending/sent → cancelled (solo admin)
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { $ref: "#/components/responses/OrderResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+  /purchase_orders/{id}/receive:
+    post:
+      tags: [Órdenes de compra]
+      summary: sent → received; crea lotes y entradas de stock
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purchase_order]
+              properties:
+                purchase_order:
+                  type: object
+                  required: [items]
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        type: object
+                        required: [id, lot_number, expiration_date]
+                        properties:
+                          id: { type: integer, description: Id del ítem de la orden }
+                          lot_number: { type: string }
+                          expiration_date: { type: string, format: date, description: Posterior a hoy }
+                          location: { type: string }
+      responses:
+        "200": { $ref: "#/components/responses/OrderResponse" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "422": { $ref: "#/components/responses/ValidationFailed" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token de POST /login. Vence a las 12 h (API_TOKEN_TTL_HOURS).
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: integer } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PerPage: { name: per_page, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+  requestBodies:
+    SupplierBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [supplier]
+            properties:
+              supplier:
+                type: object
+                properties:
+                  company_name: { type: string }
+                  cuit: { type: string, pattern: '^\d{2}-\d{8}-\d$' }
+                  email: { type: string, format: email }
+                  phone: { type: string }
+                  contact_name: { type: string }
+  responses:
+    BadRequest:
+      description: Falta un parámetro obligatorio o JSON inválido
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Unauthorized:
+      description: Sin token, token inválido/vencido o credenciales incorrectas
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    Forbidden:
+      description: El rol no permite la acción
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    NotFound:
+      description: Recurso inexistente
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    ValidationFailed:
+      description: Validación, filtro inválido o transición de estado inválida
+      content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } }
+    SupplierResponse:
+      description: Proveedor
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+              data: { $ref: "#/components/schemas/Supplier" }
+    OrderResponse:
+      description: Orden de compra con ítems
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message: { type: string }
+              data: { $ref: "#/components/schemas/PurchaseOrder" }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              enum: [bad_request, unauthorized, token_expired, invalid_credentials, forbidden, not_found, validation_failed, invalid_params, invalid_value, invalid_transition]
+            message: { type: string }
+            details:
+              type: object
+              nullable: true
+              additionalProperties: { type: array, items: { type: string } }
+    Message:
+      type: object
+      properties:
+        message: { type: string }
+    PageMeta:
+      type: object
+      properties:
+        page: { type: integer }
+        per_page: { type: integer }
+        total_count: { type: integer }
+        total_pages: { type: integer }
+    User:
+      type: object
+      properties:
+        id: { type: integer }
+        email: { type: string }
+        role: { type: string, enum: [employee, admin] }
+    LoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        token_type: { type: string, enum: [Bearer] }
+        expires_at: { type: string, format: date-time }
+        user: { $ref: "#/components/schemas/User" }
+    StockStatus: { type: string, enum: [sin_stock, stock_bajo, ok] }
+    ExpirationStatus: { type: string, enum: [vencido, critico, alerta, ok] }
+    MovementType: { type: string, enum: [entrada, salida, ajuste, devaluacion_vencimiento] }
+    OrderStatus: { type: string, enum: [pending, sent, received, cancelled] }
+    ProductSummary:
+      type: object
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        active_ingredient: { type: string, nullable: true }
+        laboratory: { type: string, nullable: true }
+        presentation: { type: string, nullable: true }
+    Product:
+      allOf:
+        - $ref: "#/components/schemas/ProductSummary"
+        - type: object
+          properties:
+            barcode: { type: string, nullable: true }
+            code: { type: string, nullable: true }
+            therapeutic_action: { type: string, nullable: true }
+            gondola_location: { type: string, nullable: true }
+            min_stock: { type: integer, nullable: true }
+            safety_stock: { type: integer, nullable: true }
+            prescription_required: { type: boolean }
+            total_stock: { type: integer }
+            stock_status: { $ref: "#/components/schemas/StockStatus" }
+    Batch:
+      type: object
+      properties:
+        id: { type: integer }
+        product_id: { type: integer }
+        lot_number: { type: string }
+        expiration_date: { type: string, format: date }
+        quantity: { type: integer }
+        location: { type: string, nullable: true }
+        status: { type: string, enum: [active, expired, recalled] }
+        expiration_status: { $ref: "#/components/schemas/ExpirationStatus" }
+        days_to_expiration: { type: integer }
+        product: { $ref: "#/components/schemas/ProductSummary" }
+    StockMovement:
+      type: object
+      properties:
+        id: { type: integer }
+        movement_type: { $ref: "#/components/schemas/MovementType" }
+        quantity: { type: integer }
+        reason: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        batch:
+          type: object
+          properties:
+            id: { type: integer }
+            lot_number: { type: string }
+            quantity: { type: integer }
+            expiration_date: { type: string, format: date }
+        product:
+          type: object
+          properties:
+            id: { type: integer }
+            name: { type: string }
+        user:
+          type: object
+          properties:
+            id: { type: integer }
+            email: { type: string }
+    Supplier:
+      type: object
+      properties:
+        id: { type: integer }
+        company_name: { type: string }
+        cuit: { type: string }
+        email: { type: string, nullable: true }
+        phone: { type: string, nullable: true }
+        contact_name: { type: string, nullable: true }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        recent_purchase_orders: { type: array, items: { $ref: "#/components/schemas/PurchaseOrder" } }
+    PurchaseOrder:
+      type: object
+      properties:
+        id: { type: integer }
+        status: { $ref: "#/components/schemas/OrderStatus" }
+        notes: { type: string, nullable: true }
+        total_amount: { type: number }
+        items_count: { type: integer }
+        supplier:
+          type: object
+          properties:
+            id: { type: integer }
+            company_name: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              product:
+                type: object
+                properties:
+                  id: { type: integer }
+                  name: { type: string }
+                  presentation: { type: string, nullable: true }
+              quantity: { type: integer }
+              unit_price: { type: number, nullable: true }
+              subtotal: { type: number }
+    Dashboard:
+      type: object
+      properties:
+        kpis:
+          type: object
+          properties:
+            total_products: { type: integer }
+            low_stock_products: { type: integer }
+            out_of_stock_products: { type: integer }
+            expired_batches: { type: integer }
+            critical_batches: { type: integer }
+            warning_batches: { type: integer }
+            pending_purchase_orders: { type: integer }
+        alerts:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [batch_expired, batch_critical, out_of_stock, low_stock] }
+              severity: { type: string, enum: [danger, warning] }
+              message: { type: string }
+              product_id: { type: integer }
+              batch_id: { type: integer, nullable: true }
+              date: { type: string, format: date, nullable: true }

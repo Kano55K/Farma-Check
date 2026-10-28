@@ -36,6 +36,7 @@ module Api
       test "orden inexistente responde 404" do
         get api_v1_purchase_order_url(id: 0), headers: @employee_headers
         assert_api_error :not_found, "not_found"
+        assert_equal "Orden de compra no encontrada", json.dig("error", "message")
       end
 
       test "crea una orden con ítems y calcula el total en el servidor" do

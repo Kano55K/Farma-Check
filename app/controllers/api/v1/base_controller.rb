@@ -22,9 +22,10 @@ module Api
 
       DEFAULT_PER_PAGE = 20
       MAX_PER_PAGE = 100
-      MODEL_NAMES = {
-        "Product" => "Producto", "Batch" => "Lote", "StockMovement" => "Movimiento",
-        "Supplier" => "Proveedor", "PurchaseOrder" => "Orden de compra", "User" => "Usuario"
+      NOT_FOUND_MESSAGES = {
+        "Product" => "Producto no encontrado", "Batch" => "Lote no encontrado",
+        "StockMovement" => "Movimiento no encontrado", "Supplier" => "Proveedor no encontrado",
+        "PurchaseOrder" => "Orden de compra no encontrada", "User" => "Usuario no encontrado"
       }.freeze
 
       before_action :authenticate_api_user!
@@ -96,8 +97,7 @@ module Api
       end
 
       def render_not_found(exception)
-        name = MODEL_NAMES.fetch(exception.model.to_s, "Recurso")
-        render_error("not_found", "#{name} no encontrado", :not_found)
+        render_error("not_found", NOT_FOUND_MESSAGES.fetch(exception.model.to_s, "Recurso no encontrado"), :not_found)
       end
 
       def render_parameter_missing(exception)
