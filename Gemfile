@@ -40,6 +40,12 @@ gem "thruster", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
+# Tailwind CSS para las vistas del back-office (se compila con bin/rails tailwindcss:watch)
+gem "tailwindcss-rails", "~> 4.6"
+
+# CORS: permite que el front-end (otro origen) consuma la API
+gem "rack-cors"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -57,6 +63,9 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # Vista de los mails enviados en desarrollo [http://localhost:3000/letter_opener]
+  gem "letter_opener_web"
 end
 
 group :test do
@@ -65,6 +74,4 @@ group :test do
   gem "selenium-webdriver"
   gem "fiddle"
   gem "json", "~> 2.7"
-  gem "tailwindcss-rails", "~> 4.6"
-  gem "letter_opener_web", group: :development
 end
