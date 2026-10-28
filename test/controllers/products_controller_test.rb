@@ -3,10 +3,16 @@ require "test_helper"
 class ProductsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @product = products(:one)
+    sign_in_as(users(:admin))
   end
 
   test "should get index" do
     get products_url
+    assert_response :success
+  end
+
+  test "should filter index by search text" do
+    get products_url, params: { search: "ibupro" }
     assert_response :success
   end
 
@@ -40,6 +46,15 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
 
   test "should destroy product" do
     assert_difference("Product.count", -1) do
+      delete product_url(@product)
+    end
+
+    assert_redirected_to products_url
+  end
+
+  test "employee cannot destroy product" do
+    sign_in_as(users(:employee))
+    assert_no_difference("Product.count") do
       delete product_url(@product)
     end
 

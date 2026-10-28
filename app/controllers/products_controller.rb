@@ -7,7 +7,7 @@ class ProductsController < ApplicationController
   def index
     @products = Product.all
 
-    @products = @products.where("products.name ILIKE ? OR products.active_ingredient ILIKE ? OR products.barcode ILIKE ?",
+    @products = @products.where("products.name LIKE ? OR products.active_ingredient LIKE ? OR products.barcode LIKE ?",
                                 "%#{params[:search]}%", "%#{params[:search]}%", "%#{params[:search]}%") if params[:search].present?
     @products = @products.where(laboratory: params[:laboratory]) if params[:laboratory].present?
     @products = @products.where(therapeutic_action: params[:therapeutic_action]) if params[:therapeutic_action].present?

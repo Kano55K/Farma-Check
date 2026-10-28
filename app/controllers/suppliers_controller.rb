@@ -35,8 +35,11 @@ class SuppliersController < ApplicationController
   end
 
   def destroy
-    @supplier.destroy!
-    redirect_to suppliers_path, notice: "Proveedor eliminado.", status: :see_other
+    if @supplier.destroy
+      redirect_to suppliers_path, notice: "Proveedor eliminado.", status: :see_other
+    else
+      redirect_to @supplier, alert: "No se puede eliminar: el proveedor tiene órdenes de compra asociadas.", status: :see_other
+    end
   end
 
   private

@@ -2,12 +2,12 @@ require "test_helper"
 
 class SupplierTest < ActiveSupport::TestCase
   test "es válido con atributos correctos" do
-    supplier = Supplier.new(company_name: "Droguería Test", cuit: "30-12345678-9")
+    supplier = Supplier.new(company_name: "Droguería Test", cuit: "30-12345678-1")
     assert supplier.valid?
   end
 
   test "no es válido sin razón social" do
-    supplier = Supplier.new(cuit: "30-12345678-9")
+    supplier = Supplier.new(cuit: "30-12345678-1")
     assert_not supplier.valid?
     assert_includes supplier.errors[:company_name], "can't be blank"
   end
@@ -19,8 +19,8 @@ class SupplierTest < ActiveSupport::TestCase
   end
 
   test "no permite CUITs duplicados" do
-    Supplier.create!(company_name: "Droguería A", cuit: "30-12345678-9")
-    supplier = Supplier.new(company_name: "Droguería B", cuit: "30-12345678-9")
+    Supplier.create!(company_name: "Droguería A", cuit: "30-12345678-1")
+    supplier = Supplier.new(company_name: "Droguería B", cuit: "30-12345678-1")
     assert_not supplier.valid?
     assert_includes supplier.errors[:cuit], "has already been taken"
   end
@@ -29,5 +29,25 @@ class SupplierTest < ActiveSupport::TestCase
     supplier = Supplier.new(company_name: "Test", cuit: "30-99999999-9", email: "no-es-un-email")
     assert_not supplier.valid?
     assert_includes supplier.errors[:email], "is invalid"
+  end
+end
+
+class SupplierCuitTest < ActiveSupport::TestCase
+  test "rechaza un CUIT con formato inválido" do
+    supplier = Supplier.new(company_name: "Test", cuit: "30123456781")
+    assert_not supplier.valid?
+    assert_includes supplier.errors[:cuit], "debe tener el formato XX-XXXXXXXX-X"
+  end
+
+  test "rechaza un CUIT con dígito verificador incorrecto" do
+    supplier = Supplier.new(company_name: "Test", cuit: "30-12345678-9")
+    assert_not supplier.valid?
+    assert_includes supplier.errors[:cuit], "tiene un dígito verificador inválido"
+  end
+
+  test "no permite eliminar un proveedor con órdenes de compra" do
+    supplier = suppliers(:one)
+    assert_not supplier.destroy
+    assert Supplier.exists?(supplier.id)
   end
 end

@@ -5,6 +5,16 @@
     <strong>Lote:</strong> <%= @batch.lot_number %> (Stock actual: <%= @batch.quantity %>)
   </p>
 
+  <% if @stock_movement.errors.any? %>
+    <div class="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
+      <ul class="list-disc pl-5">
+        <% @stock_movement.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <%= form_with(model: [@batch, @stock_movement], local: true, class: "space-y-4") do |f| %>
     <div>
       <%= f.label :movement_type, "Tipo de Movimiento", class: "block text-sm font-medium text-gray-700" %>

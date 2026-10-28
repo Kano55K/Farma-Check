@@ -2,10 +2,11 @@ require "test_helper"
 
 class UserMailerTest < ActionMailer::TestCase
   test "welcome" do
-    mail = UserMailer.welcome
-    assert_equal "Welcome", mail.subject
-    assert_equal [ "to@example.org" ], mail.to
+    user = users(:employee)
+    mail = UserMailer.welcome(user)
+    assert_equal "Bienvenido a Farma-Check", mail.subject
+    assert_equal [ user.email_address ], mail.to
     assert_equal [ "from@example.com" ], mail.from
-    assert_match "Hi", mail.body.encoded
+    assert_match user.email_address, mail.body.encoded
   end
 end

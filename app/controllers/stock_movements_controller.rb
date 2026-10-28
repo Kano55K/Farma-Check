@@ -12,8 +12,8 @@ class StockMovementsController < ApplicationController
 
   def create
     @stock_movement = @batch.stock_movements.new(stock_movement_params)
-    # Temporalmente asignamos el primer usuario hasta conectar la autenticación completa
-    @stock_movement.user = User.first || User.create!(email_address: "admin@farmacia.com", password: "password123", role: :admin)
+    # El movimiento queda registrado a nombre del usuario que inició sesión.
+    @stock_movement.user = Current.session.user
 
     if @stock_movement.save
       redirect_to root_path, notice: "Movimiento de stock registrado exitosamente."
