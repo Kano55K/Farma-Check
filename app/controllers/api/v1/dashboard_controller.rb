@@ -35,7 +35,7 @@ module Api
           expired = batch.expiration_status == :vencido
           {
             type: expired ? "batch_expired" : "batch_critical",
-            severity: expired ? "danger" : "warning",
+            severity: "danger",
             message: "#{batch.product.name}: lote #{batch.lot_number} #{expired ? 'vencido el' : 'vence el'} #{batch.expiration_date.strftime('%d/%m/%Y')}",
             product_id: batch.product_id,
             batch_id: batch.id,
