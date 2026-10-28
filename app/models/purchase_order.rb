@@ -5,6 +5,18 @@ class PurchaseOrder < ApplicationRecord
   # Se lanza cuando se pide una transición de estado que no corresponde.
   class InvalidTransition < StandardError; end
 
+  STATUS_LABELS = { "pending" => "pendiente", "sent" => "enviada", "received" => "recibida", "cancelled" => "cancelada" }.freeze
+  TRANSITION_VERBS = { "sent" => "enviar", "received" => "recibir", "cancelled" => "cancelar" }.freeze
+  RECEPTION_FIELDS = { "lot_number" => "número de lote", "expiration_date" => "vencimiento" }.freeze
+
+  # Nombres legibles para los errores de recepción ("items[0].lot_number" → "Ítem 1: número de lote").
+  def self.human_attribute_name(attribute, options = {})
+    match = attribute.to_s.match(/\Aitems\[(\d+)\](?:\.(\w+))?\z/)
+    return super unless match
+
+    [ "Ítem #{match[1].to_i + 1}", RECEPTION_FIELDS[match[2]] ].compact.join(": ")
+  end
+
   belongs_to :supplier
   has_many :purchase_order_items, dependent: :destroy
   has_many :products, through: :purchase_order_items
@@ -71,7 +83,7 @@ class PurchaseOrder < ApplicationRecord
   end
 
   def transition_message(to)
-    "No se puede pasar la orden de \"#{status}\" a \"#{to}\""
+    "No se puede #{TRANSITION_VERBS.fetch(to.to_s)} una orden #{STATUS_LABELS.fetch(status)}"
   end
 
   # Junta todos los errores de los datos de recepción antes de tocar la base.

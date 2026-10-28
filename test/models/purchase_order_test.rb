@@ -22,7 +22,8 @@ class PurchaseOrderTest < ActiveSupport::TestCase
   end
 
   test "no envía una orden que ya fue enviada" do
-    assert_raises(PurchaseOrder::InvalidTransition) { purchase_orders(:sent).send_order! }
+    error = assert_raises(PurchaseOrder::InvalidTransition) { purchase_orders(:sent).send_order! }
+    assert_equal "No se puede enviar una orden enviada", error.message
   end
 
   test "cancela órdenes pendientes o enviadas, pero no recibidas" do
@@ -56,6 +57,7 @@ class PurchaseOrderTest < ActiveSupport::TestCase
         order.receive!([ { id: item.id, lot_number: "", expiration_date: "2020-01-01" } ], users(:employee))
       end
     end
+    assert_equal [ "Ítem 1: número de lote es obligatorio", "Ítem 1: vencimiento debe ser posterior a hoy" ], order.errors.full_messages
     assert order.reload.sent?
   end
 
